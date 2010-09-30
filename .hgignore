@@ -1,0 +1,24 @@
+syntax: glob
+
+*.csproj.user
+*.csproj.vspscc
+*.msi
+*.pdb
+*.rar
+*.suo
+*.vbproj.user
+*.vbproj.vspscc
+*.vshost.exe
+*.vspscc
+*.vssscc
+*.zip
+
+*/Bin/*
+*/bin/*
+*/obj/*
+
+
+syntax: regexp
+
+^.*[R|r]eleases/.*
+^.*[B|b]inaries/.*
