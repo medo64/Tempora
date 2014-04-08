@@ -1,22 +1,46 @@
+#define AppName        GetStringFileInfo('..\Binaries\Tempora.exe', 'ProductName')
+#define AppVersion     GetStringFileInfo('..\Binaries\Tempora.exe', 'ProductVersion')
+#define AppFileVersion GetStringFileInfo('..\Binaries\Tempora.exe', 'FileVersion')
+#define AppCompany     GetStringFileInfo('..\Binaries\Tempora.exe', 'CompanyName')
+#define AppCopyright   GetStringFileInfo('..\Binaries\Tempora.exe', 'LegalCopyright')
+#define AppBase        LowerCase(StringChange(AppName, ' ', ''))
+#define AppSetupFile   AppBase + StringChange(AppVersion, '.', '')
+#define AppVersionEx   StringChange(AppVersion, '0.00', '(latest)')
+
 [Setup]
-AppName=Tempora
-AppVerName=Tempora 1.01
-DefaultDirName={pf}\Josip Medved\Tempora
-OutputBaseFilename=tempora101
+AppName={#AppName}
+AppVersion={#AppVersion}
+AppVerName={#AppName} {#AppVersion}
+AppPublisher={#AppCompany}
+AppPublisherURL=http://jmedved.com/{#AppBase}/
+AppCopyright={#AppCopyright}
+VersionInfoProductVersion={#AppVersion}
+VersionInfoProductTextVersion={#AppVersion}
+VersionInfoVersion={#AppFileVersion}
+DefaultDirName={pf}\{#AppCompany}\{#AppName}
+OutputBaseFilename={#AppSetupFile}
 OutputDir=..\Releases
 SourceDir=..\Binaries
 AppId=JosipMedved_Tempora
-AppPublisher=Josip Medved
-AppPublisherURL=http://bitbucket.org/jmedved/tempora
+CloseApplications="yes"
+RestartApplications="no"
 UninstallDisplayIcon={app}\Tempora.exe
 AlwaysShowComponentsList=no
 ArchitecturesInstallIn64BitMode=x64
 DisableProgramGroupPage=yes
 MergeDuplicateFiles=yes
-MinVersion=0,5.01
+MinVersion=0,6.01.7200
 PrivilegesRequired=admin
 ShowLanguageDialog=no
 SolidCompression=yes
+ChangesAssociations=yes
+DisableWelcomePage=yes
+LicenseFile=..\Setup\License.txt
+
+[Messages]
+SetupAppTitle=Setup {#AppName} {#AppVersionEx}
+SetupWindowTitle=Setup {#AppName} {#AppVersionEx}
+BeveledLabel=jmedved.com
 
 [Files]
 Source: "Tempora.exe"; DestDir: "{app}"; Flags: ignoreversion;
@@ -40,5 +64,5 @@ var
     ResultCode: Integer;
 begin
     Exec(ExpandConstant('{app}\Tempora.exe'), '/Uninstall', '', SW_SHOW, ewWaitUntilTerminated, ResultCode)
+    Result := Result;
 end;
-
