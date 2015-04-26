@@ -73,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\App.ico" />
-    <Content Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

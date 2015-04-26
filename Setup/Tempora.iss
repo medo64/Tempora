@@ -5,7 +5,12 @@
 #define AppCopyright   GetStringFileInfo('..\Binaries\Tempora.exe', 'LegalCopyright')
 #define AppBase        LowerCase(StringChange(AppName, ' ', ''))
 #define AppSetupFile   AppBase + StringChange(AppVersion, '.', '')
-#define AppVersionEx   StringChange(AppVersion, '0.00', '(latest)')
+
+#define AppVersionEx   StringChange(AppVersion, '0.00', '')
+#if "" != VersionHash
+#  define AppVersionEx AppVersionEx + " (" + VersionHash + ")"
+#endif
+
 
 [Setup]
 AppName={#AppName}
@@ -15,7 +20,7 @@ AppPublisher={#AppCompany}
 AppPublisherURL=http://jmedved.com/{#AppBase}/
 AppCopyright={#AppCopyright}
 VersionInfoProductVersion={#AppVersion}
-VersionInfoProductTextVersion={#AppVersion}
+VersionInfoProductTextVersion={#AppVersionEx}
 VersionInfoVersion={#AppFileVersion}
 DefaultDirName={pf}\{#AppCompany}\{#AppName}
 OutputBaseFilename={#AppSetupFile}
@@ -35,7 +40,7 @@ ShowLanguageDialog=no
 SolidCompression=yes
 ChangesAssociations=yes
 DisableWelcomePage=yes
-LicenseFile=..\Setup\License.txt
+LicenseFile=..\Setup\License.rtf
 
 [Messages]
 SetupAppTitle=Setup {#AppName} {#AppVersionEx}
@@ -58,6 +63,11 @@ Filename: "{app}\Tempora.exe"; Parameters: "/Uninstall"; Flags: runascurrentuser
 
 
 [Code]
+
+procedure InitializeWizard;
+begin
+  WizardForm.LicenseAcceptedRadio.Checked := True;
+end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var

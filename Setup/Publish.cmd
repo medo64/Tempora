@@ -1,9 +1,10 @@
 @ECHO OFF
+SETLOCAL enabledelayedexpansion
 
 SET        FILE_SETUP=".\Tempora.iss"
 SET     FILE_SOLUTION="..\Source\Tempora.sln"
 SET  FILES_EXECUTABLE="..\Binaries\Tempora.exe"
-SET       FILES_OTHER=
+SET       FILES_OTHER="..\Binaries\ReadMe.txt" "..\Binaries\License.txt"
 SET     FILES_LICENSE="License.txt"
 
 SET    COMPILE_TOOL_1="%PROGRAMFILES(X86)%\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe"
@@ -13,6 +14,9 @@ SET        SETUP_TOOL="%PROGRAMFILES(x86)%\Inno Setup 5\iscc.exe"
 SET         SIGN_TOOL="%PROGRAMFILES(X86)%\Windows Kits\8.0\bin\x86\signtool.exe"
 SET         SIGN_HASH="C02FF227D5EE9F555C13D4C622697DF15C6FF871"
 SET SIGN_TIMESTAMPURL="http://timestamp.comodoca.com/rfc3161"
+
+FOR /F "delims=" %%N IN ('git rev-list --count HEAD') DO @SET VERSION_NUMBER=%%N%
+FOR /F "delims=" %%N IN ('git log -n 1 --format^=%%h') DO @SET VERSION_HASH=%%N%
 
 
 ECHO --- BUILD SOLUTION
@@ -33,6 +37,8 @@ IF EXIST %COMPILE_TOOL_1% (
 
 RMDIR /Q /S "..\Binaries" 2> NUL
 %COMPILE_TOOL% /Build "Release" %FILE_SOLUTION%
+COPY ..\README.md ..\Binaries\ReadMe.txt
+COPY ..\LICENSE.md ..\Binaries\License.txt
 IF ERRORLEVEL 1 PAUSE && EXIT /B %ERRORLEVEL%
 
 ECHO.
@@ -64,7 +70,7 @@ ECHO --- BUILD SETUP
 ECHO.
 
 RMDIR /Q /S ".\Temp" 2> NUL
-CALL %SETUP_TOOL% /O".\Temp" %FILE_SETUP%
+CALL %SETUP_TOOL% /DVersionHash=%VERSION_HASH% /O".\Temp" %FILE_SETUP%
 IF ERRORLEVEL 1 PAUSE && EXIT /B %ERRORLEVEL%
 
 FOR /F %%I IN ('DIR ".\Temp\*.exe" /B') DO SET _SETUPEXE=%%I
@@ -74,14 +80,16 @@ ECHO.
 ECHO.
 
 
-ECHO --- RENAME LATEST
+ECHO --- RENAME BUILD
 ECHO.
 
 SET _OLDSETUPEXE=%_SETUPEXE%
-SET _SETUPEXE=%_SETUPEXE:000=-LATEST%
-IF NOT %_OLDSETUPEXE%==%_SETUPEXE% (
+IF NOT [%VERSION_HASH%]==[] (
+    SET _SETUPEXE=!_SETUPEXE:000=-rev%VERSION_NUMBER%-%VERSION_HASH%!
+)
+IF NOT "%_OLDSETUPEXE%"=="%_SETUPEXE%" (
     ECHO Renaming %_OLDSETUPEXE% to %_SETUPEXE%
-    MOVE .\Temp\%_OLDSETUPEXE% .\Temp\%_SETUPEXE%
+    MOVE ".\Temp\%_OLDSETUPEXE%" ".\Temp\%_SETUPEXE%"
 ) ELSE (
     ECHO No rename needed.
 )
